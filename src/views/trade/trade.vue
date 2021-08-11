@@ -63,6 +63,7 @@ export default {
                     { label: 'buy_date', key: 'buy_date', type: 'date' },
                     { label: 'sale_date', key: 'sale_date', type: 'date' },
                     { label: 'stop_loss', key: 'stop_loss', type: 'number' },
+                    { label: 'stop_buy', key: 'stop_buy', type: 'number' },
                     { label: 'buy', key: 'buy', type: 'number' },
                     { label: 'num', key: 'num', type: 'number' },
                     { label: 'sale', key: 'sale', type: 'number' },
@@ -74,6 +75,15 @@ export default {
                             { label: '日', value: 'day' },
                             { label: '周', value: 'week' },
                             { label: '月', value: 'month' }
+                        ]
+                    },
+                    {
+                        label: 'is_buy',
+                        key: 'is_buy',
+                        type: 'radio',
+                        options: [
+                            { label: '是', value: '1' },
+                            { label: '否', value: '0' }
                         ]
                     },
                     {
@@ -89,6 +99,15 @@ export default {
                 ]
             },
             tableOptions: {
+                rowClassName: ({ row, index }) => {
+                    if (row.is_sale === '1') {
+                        return 'sale';
+                    } else if (row.is_buy === '1') {
+                        return 'buy';
+                    } else {
+                        return 'other';
+                    }
+                },
                 border: true,
                 localData: [],
                 btns: [
@@ -102,8 +121,10 @@ export default {
                     { label: '仓位', key: 'num' },
                     { label: '卖出', key: 'sale' },
                     { label: '止损', key: 'stop_loss' },
+                    { label: '止盈', key: 'stop_buy' },
                     { label: '买入日期', key: 'buy_date' },
                     { label: '卖出日期', key: 'sale_date' },
+                    { label: '是否买入', key: 'is_buy' },
                     { label: '是否卖出', key: 'is_sale' },
                     { label: '模型', key: 'model' },
                     { label: '周期', key: 'dwm' },
@@ -112,7 +133,7 @@ export default {
             },
             dialog: {
                 title: '提示',
-                width: '50%',
+                width: '80%',
                 visible: false
             }
         };
@@ -128,12 +149,11 @@ export default {
             const res = await services.query();
             this.tableOptions.localData = res.data;
             // 根据数据去 组成echart
-            let list = res.data.filter(level1 => level1.is_sale === '0');
+            let list = res.data.filter(level1 => level1.is_sale === '0' && level1.is_buy === '1');
             Promise.all(
                 list
                     .map(async level1 => {
                         let { code, buy_date, sale_date, is_sale } = level1;
-                        if (is_sale === '1') return;
                         return services.echartQuery({ code, buy_date, sale_date });
                     })
                     .filter(level1 => level1)
@@ -156,7 +176,7 @@ export default {
                     pieData = [],
                     barData = [];
                 datas.map((level1, index1) => {
-                    let { name, buy_date, buy, sale_date, sale, num } = list[index1];
+                    let { name, buy_date, buy, sale_date, sale, num, stop_loss, stop_buy } = list[index1];
                     let data = [],
                         arr = level1.data;
                     if (!arr.length) arr = [{ d: buy_date, c: buy }];
@@ -164,7 +184,23 @@ export default {
                     // 饼图
                     pieData.push({ value: buy * num, name });
                     // 柱状图
-                    barData.push((arr[arr.length - 1].c - buy).toFixed(2));
+                    let barC = arr[arr.length - 1].c;
+                    let bar = {
+                        buy: barC - buy,
+                        stop_loss: barC <= stop_loss,
+                        stop_buy: barC >= stop_buy
+                    };
+                    // this.tableOptions.rowClassName = ({row, index}) => {
+                    //     debugger
+                    // }
+                    if (bar.stop_loss) {
+                        this.showNitice('error', '止损', `${name} 已到达止损位`, 0, 'top-right');
+                    } else if (bar.stop_buy) {
+                        this.showNitice('success', '止盈', `${name} 已到达止盈位`, 4500, 'bottom-right');
+                    } else if (bar.buy < 0) {
+                        this.showNitice('warning', '亏损', `${name} 盈利负增长`, 2500, 'bottom-left');
+                    }
+                    barData.push((bar.buy * num).toFixed(2));
                     // 折线
                     arr.forEach(level2 => {
                         let { d, c } = level2;
@@ -260,6 +296,8 @@ export default {
         tableAdd() {
             this.dialog.title = '新增';
             this.forms.model.is_sale = '0';
+            this.forms.model.is_buy = '0';
+            this.forms.model.dwm = 'day';
             this.forms.model.num = 100;
             this.dialog.visible = true;
         },
@@ -318,6 +356,14 @@ export default {
                     return x1[0] - y1[0];
                 }
             });
+        },
+        showNitice(type, title, message, duration = 0, position = 'bottom-right') {
+            this.$notify[type]({
+                title,
+                message,
+                duration,
+                position
+            });
         }
     }
 };
@@ -329,6 +375,17 @@ export default {
     .trade-table {
         margin: 5px;
         box-shadow: 0 0 3px 1px #82c1f0;
+        /deep/ .el-table {
+            .sale {
+                background: #ffe6e6;
+            }
+            .buy {
+                background: #f8fff5;
+            }
+            .other {
+                background: #f4f4f4;
+            }
+        }
     }
     .trade-btn {
         margin: 5px;
