@@ -176,7 +176,7 @@ export default {
                     pieData = [],
                     barData = [];
                 datas.map((level1, index1) => {
-                    let { name, buy_date, buy, sale_date, sale, num, stop_loss, stop_buy } = list[index1];
+                    let { name, buy_date, buy, sale_date, sale, is_sale, num, stop_loss, stop_buy } = list[index1];
                     let data = [],
                         arr = level1.data;
                     if (!arr.length) arr = [{ d: buy_date, c: buy }];
@@ -197,7 +197,7 @@ export default {
                         this.showNitice('error', '止损', `${name} 已到达止损位`, 0, 'top-right');
                     } else if (bar.stop_buy) {
                         this.showNitice('success', '止盈', `${name} 已到达止盈位`, 4500, 'bottom-right');
-                    } else if (bar.buy < 0) {
+                    } else if (bar.buy < 0 && is_sale === '0') {
                         this.showNitice('warning', '亏损', `${name} 盈利负增长`, 2500, 'bottom-left');
                     }
                     barData.push((bar.buy * num).toFixed(2));
