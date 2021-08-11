@@ -1,88 +1,82 @@
 <template>
-    <div>
-        11111111111111
+    <div class="table-section">
+        <div class="trade-table">
+            <div class="btn">
+                <el-button type="primary" @click="tableAdd">新增</el-button>
+            </div>
+        </div>
+        <v-chart :options="options"></v-chart>
+
+        <el-dialog :title="dialog.title" :visible.sync="dialog.visible" :width="dialog.width">
+            <form-section :forms="forms"></form-section>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialog.visible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogOk">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-import { getUrl, CODELIST } from './../../../core';
+import services from '../../services/services';
 export default {
-    name: 'tableSection',
+    name: 'table-section',
     data() {
         return {
-            historys: {},
-            stash: {}
+            options: {},
+            forms: {},
+            dialog: {
+                title: '提示',
+                width: '50%',
+                visible: false
+            }
         };
     },
     created() {
-        // 1. 获取当前日期
-        let newDate = new Date().toLocaleDateString();
-        // 2. 如果有缓存就赋值
-        let list = localStorage.getItem('history') ?? '{}';
-        this.historys = JSON.parse(list);
-        // 3. 如果有缓存日期
-        let date = localStorage.getItem('date');
-        // console.log(this.getSliceList(-3));
-
-        Promise.all(
-            CODELIST.map(code => {
-                // 4. 如果historys中没有 && 今日的日期和缓存的不一样
-                if (!this.historys[code] && date !== newDate) {
-                    return this.api(code);
-                }
-            })
-        ).then(datas => {
-            debugger;
-            // 5. 如果调完成后，重新将 日期、所有数据 存储起来
-            // localStorage.setItem('date', newDate)
-            localStorage.setItem('history', JSON.stringify(this.historys));
+        setTimeout(() => {
+            this.options = {
+                title: {
+                    text: 'ECharts 入门示例'
+                },
+                tooltip: {},
+                xAxis: {
+                    data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+                },
+                yAxis: {},
+                series: [
+                    {
+                        name: '销量',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }
+                ]
+            };
+            this.forms = {
+                model: {},
+                labelWidth: '80px',
+                list: [
+                    { label: 'code', key: 'code' },
+                    { label: 'name', key: 'name' },
+                    { label: 'buy_date', key: 'buy_date' },
+                    { label: 'sale_date', key: 'sale_date' },
+                    { label: 'stop_loss', key: 'stop_loss' },
+                    { label: 'buy', key: 'buy' },
+                    { label: 'sale', key: 'sale' },
+                    { label: 'remark', key: 'remark' }
+                ]
+            };
         });
     },
     methods: {
-        getSliceList(num) {
-            return this.historys.slice(num);
+        tableAdd() {
+            this.dialog.visible = true;
         },
-        isKlyh(data) {
-            let [d1, d2, d3] = data;
-            if (this.YingYang(d1) !== 2) return;
-            if (this.YingYang(d2) !== 2) return;
-            if (this.YingYang(d3) !== 1) return;
-            if (this.entity(d1) >= this.entity(d2)) {
-                // 怎么算小？怎么算大？
-                return;
-            }
-            if (!this.lohc(d2, d3)) return;
-        },
-        entity(data) {
-            // 实体
-            let { o, c } = data;
-            return Math.abs(o - c);
-        },
-        YingYang(data) {
-            // yang1， ying2，shizixing3
-            let { o, c } = data;
-            if (c > o) {
-                return 1;
-            } else if (c < o) {
-                return 2;
-            } else {
-                return 3;
-            }
-        },
-
-        shadowLineTop(deviation) {
-            // 上影线
-        },
-        shadowLineBottom(deviation) {
-            // 下影线
-        },
-        lohc(d1, d2) {
-            return d2.o < d1.c && d2.c > d1.c;
-        },
-        api(code) {
-            return fetch(getUrl(code)).then(res => {
-                return res.json();
-            });
+        async dialogOk() {
+            console.log(this.forms?.model);
+            const res = await services.add(this.forms?.model);
+            this.$message.success(res.message);
+            this.dialog.visible = false;
+            this.forms.model = {};
         }
     }
 };

@@ -5,13 +5,21 @@ import { createRouter } from './router';
 import _ from 'lodash';
 window._ = _;
 
+window.fetchUrl = 'http://localhost:3333';
+
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
+import comps from './components';
+
 Vue.config.productionTip = false;
 
 // const router = createRouter();
+
+Object.values(comps).forEach(comp => {
+    Vue.component(comp.name, comp);
+});
 
 new Vue({
     // router,

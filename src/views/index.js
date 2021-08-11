@@ -1,4 +1,4 @@
-import tableSection from './tableSection';
+import trade from './trade';
 
 export default {
     // index: {
@@ -10,7 +10,7 @@ export default {
     //     // },
     //     // children: [tableSection]
     // }
-    path: '/index',
-    name: 'index',
-    component: tableSection
+    path: '/trade',
+    name: 'trade',
+    component: trade
 };

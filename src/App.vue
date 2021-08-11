@@ -1,16 +1,29 @@
 <template>
     <div id="app">
         <!-- <router-view /> -->
-        <table-section></table-section>
+        <trade-section></trade-section>
     </div>
 </template>
 
 <script>
-import tableSection from './views/tableSection/tableSection.vue';
+import tradeSection from './views/trade/trade.vue';
 export default {
     name: 'App',
-    components: { tableSection }
+    components: { tradeSection }
 };
 </script>
 
-<style></style>
+<style lang="less" scoped>
+#app {
+    height: 100vh;
+    background: #cfcfcf;
+}
+</style>
+
+<style>
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+</style>
