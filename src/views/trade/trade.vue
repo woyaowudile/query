@@ -8,6 +8,9 @@
                     </template>
                     <div class="trade-btn">
                         <el-button type="primary" @click="tableAdd">新增</el-button>
+                        <!-- <el-button type="primary" @click="modelDownload">下载</el-button> -->
+                        <a href="http://127.0.0.1:3333/api/before/download?d=15">筛选模型</a>
+                        <a href="http://127.0.0.1:3333/api/download?d=today">下载</a>
                     </div>
                     <table-comp
                         class="trade-table"
@@ -364,7 +367,8 @@ export default {
                 duration,
                 position
             });
-        }
+        },
+        modelDownload() {}
     }
 };
 </script>
