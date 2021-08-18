@@ -8,9 +8,10 @@
                     </template>
                     <div class="trade-btn">
                         <el-button type="primary" @click="tableAdd">新增</el-button>
-                        <!-- <el-button type="primary" @click="modelDownload">下载</el-button> -->
-                        <a href="http://127.0.0.1:3333/api/before/download?d=15">筛选模型</a>
-                        <a href="http://127.0.0.1:3333/api/download?d=today">下载</a>
+                        <el-button type="primary" @click="chooseModel">筛选模型</el-button>
+                        <el-button type="primary" @click="modelDownload">下载</el-button>
+                        <!-- <a href="http://127.0.0.1:3333/api/before/download?d=15">筛选模型</a>
+                        <a href="http://127.0.0.1:3333/api/download?d=today">下载</a> -->
                     </div>
                     <table-comp
                         class="trade-table"
@@ -41,6 +42,23 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogCancel">取 消</el-button>
                 <el-button type="primary" @click="dialogOk">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog :title="model.title" :visible.sync="model.visible" :width="model.width">
+            <div>
+                <el-row>
+                    <el-col :span="12">
+                        <el-input v-model="model.type" placeholder="请输入type"></el-input>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-input v-model="model.d" placeholder="请输入d"></el-input>
+                    </el-col>
+                </el-row>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="model.visible = false">取 消</el-button>
+                <el-button type="primary" @click="modelOk">确 定</el-button>
             </span>
         </el-dialog>
     </div>
@@ -138,6 +156,13 @@ export default {
                 title: '提示',
                 width: '80%',
                 visible: false
+            },
+            model: {
+                title: '提示',
+                width: '80%',
+                visible: false,
+                type: 'day',
+                d: 15
             }
         };
     },
@@ -368,7 +393,31 @@ export default {
                 position
             });
         },
-        modelDownload() {}
+        getBox() {
+            return <div>{}</div>;
+        },
+        chooseModel() {
+            this.model.visible = true;
+        },
+        async modelOk() {
+            this.model.visible = false;
+            let { type, d } = this.model;
+            if (type) {
+                const res = await services.beforeDownload({ type, d });
+                this.$message.success(res.message);
+            } else {
+                let url = `http://40c1e1467e59.ngrok.io/api/download?d=${d}`;
+                let a = document.createElement('a');
+                document.body.appendChild(a);
+                a.href = url;
+                a.download = '汇总_today.xlsx';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }
+        },
+        modelDownload() {
+            this.model.visible = true;
+        }
     }
 };
 </script>

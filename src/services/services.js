@@ -1,3 +1,5 @@
+let node3333 = `/node3333`;
+
 function add(params) {
     return fetch(`/api/trade/add`, {
         method: 'POST',
@@ -29,10 +31,24 @@ function echartQuery(params) {
     }).then(res => res.json());
 }
 
+function beforeDownload({ type, d }) {
+    let params = `type=${type}&d=${d / 1}`;
+    return fetch(`${node3333}/api/before/download?${params}`).then(res => res.json());
+}
+function download({ d }) {
+    let url = `${node3333}/api/download`;
+    if (d) {
+        url += `?d=${d}`;
+    }
+    return fetch(url).then(res => res.json());
+}
+
 export default {
     add,
     del,
     update,
     echartQuery,
-    query
+    query,
+    beforeDownload,
+    download
 };

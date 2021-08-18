@@ -4,6 +4,7 @@
             :row-class-name="datas.rowClassName"
             :data="datas.localData"
             :border="datas.border"
+            :max-height="maxHeight || 200"
             style="width: 100%"
         >
             <el-table-column label="操作" width="100">
