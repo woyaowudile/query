@@ -1,22 +1,22 @@
 <template>
     <div id="app">
-        <!-- <router-view /> -->
-        <trade-section></trade-section>
+        <router-view></router-view>
+        <!-- <trade-section></trade-section> -->
     </div>
 </template>
 
 <script>
-import tradeSection from './views/trade/trade.vue';
+// import tradeSection from './views/trade/trade.vue';
 export default {
-    name: 'App',
-    components: { tradeSection }
+    name: 'App'
+    // components: { tradeSection }
 };
 </script>
 
 <style lang="less" scoped>
 #app {
     height: 100vh;
-    background: #cfcfcf;
+    background: #fff;
 }
 </style>
 

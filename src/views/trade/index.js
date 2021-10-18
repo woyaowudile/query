@@ -1,6 +1,6 @@
+import trade from './trade';
 export default {
-    table: {
-        name: 'trade',
-        component: () => import('./trade')
-    }
+    path: '/trade',
+    name: 'trade',
+    component: trade
 };

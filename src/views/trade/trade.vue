@@ -38,7 +38,7 @@
         </div>
 
         <el-dialog :title="dialog.title" :visible.sync="dialog.visible" :width="dialog.width">
-            <form-section :forms="forms"></form-section>
+            <form-section :forms="forms" @on-change="formChange"></form-section>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogCancel">取 消</el-button>
                 <el-button type="primary" @click="dialogOk">确 定</el-button>
@@ -74,13 +74,76 @@ export default {
             options1: {},
             options2: {},
             options3: {},
+            tableOptions: {
+                rowClassName: ({ row, index }) => {
+                    if (row.is_sale === '1') {
+                        return 'sale';
+                    } else if (row.is_buy === '1') {
+                        return 'buy';
+                    } else {
+                        return 'other';
+                    }
+                },
+                border: true,
+                localData: [],
+                btns: [
+                    { label: '编辑', click: 'on-edit' },
+                    { label: '删除', click: 'on-del' }
+                ],
+                list: [
+                    { label: '代码', key: 'code' },
+                    { label: '名称', key: 'name' },
+                    { label: '买入', key: 'buy' },
+                    { label: '仓位', key: 'num' },
+                    { label: '卖出', key: 'sale' },
+                    { label: '止损', key: 'stop_loss' },
+                    { label: '止盈', key: 'stop_buy' },
+                    { label: '买入日期', key: 'buy_date' },
+                    { label: '卖出日期', key: 'sale_date' },
+                    { label: '是否买入', key: 'is_buy' },
+                    { label: '是否卖出', key: 'is_sale' },
+                    { label: '模型', key: 'model' },
+                    { label: '周期', key: 'dwm' },
+                    { label: '备注', key: 'remark' }
+                ]
+            },
+            modelOpts: [
+                { label: '亢龙', value: '亢龙', profit: 10 },
+                { label: '一箭双雕', value: '一箭双雕', profit: 10 },
+                { label: '七星1', value: '七星1', profit: 20 },
+                { label: '七星2', value: '七星2', profit: 30 },
+                { label: '反客为主', value: '反客为主', profit: 10 },
+                { label: '以逸待劳', value: '以逸待劳', profit: 10 },
+                { label: '出水芙蓉', value: '出水芙蓉', profit: 10 },
+                { label: '隔山打牛', value: '隔山打牛', profit: 10 },
+                { label: '大有', value: '大有', profit: 10 },
+                { label: '峰回路转', value: '峰回路转', profit: 10 },
+                { label: '龙战与野', value: '龙战与野', profit: 10 },
+                { label: '飞龙在天', value: '飞龙在天', profit: 10 },
+                { label: '柳暗花明', value: '柳暗花明', profit: 10 },
+                { label: '神0', value: '神0', profit: 10 },
+                { label: '神1', value: '神1', profit: 10 },
+                { label: '神2', value: '神2', profit: 10 },
+                { label: '神3', value: '神3', profit: 10 },
+                { label: '神4', value: '神4', profit: 10 },
+                { label: '葛八', value: '葛八', profit: 10 }
+            ],
             forms: {
                 model: {},
                 labelWidth: '80px',
                 list: [
                     { label: 'code', key: 'code', type: 'text' },
-                    { label: 'name', key: 'name', type: 'text' },
-                    { label: 'model', key: 'model', type: 'text' },
+                    {
+                        label: 'name',
+                        key: 'name',
+                        type: 'text'
+                    },
+                    {
+                        label: 'model',
+                        key: 'model',
+                        type: 'select',
+                        options: []
+                    },
                     { label: 'buy_date', key: 'buy_date', type: 'date' },
                     { label: 'sale_date', key: 'sale_date', type: 'date' },
                     { label: 'stop_loss', key: 'stop_loss', type: 'number' },
@@ -119,39 +182,6 @@ export default {
                     { label: 'remark', key: 'remark', type: 'area' }
                 ]
             },
-            tableOptions: {
-                rowClassName: ({ row, index }) => {
-                    if (row.is_sale === '1') {
-                        return 'sale';
-                    } else if (row.is_buy === '1') {
-                        return 'buy';
-                    } else {
-                        return 'other';
-                    }
-                },
-                border: true,
-                localData: [],
-                btns: [
-                    { label: '编辑', click: 'on-edit' },
-                    { label: '删除', click: 'on-del' }
-                ],
-                list: [
-                    { label: '代码', key: 'code' },
-                    { label: '名称', key: 'name' },
-                    { label: '买入', key: 'buy' },
-                    { label: '仓位', key: 'num' },
-                    { label: '卖出', key: 'sale' },
-                    { label: '止损', key: 'stop_loss' },
-                    { label: '止盈', key: 'stop_buy' },
-                    { label: '买入日期', key: 'buy_date' },
-                    { label: '卖出日期', key: 'sale_date' },
-                    { label: '是否买入', key: 'is_buy' },
-                    { label: '是否卖出', key: 'is_sale' },
-                    { label: '模型', key: 'model' },
-                    { label: '周期', key: 'dwm' },
-                    { label: '备注', key: 'remark' }
-                ]
-            },
             dialog: {
                 title: '提示',
                 width: '80%',
@@ -168,6 +198,9 @@ export default {
     },
     async created() {
         this.tableQuery();
+    },
+    mounted() {
+        this.forms.list[2].options = this.modelOpts;
     },
     methods: {
         getId() {
@@ -417,6 +450,13 @@ export default {
         },
         modelDownload() {
             this.model.visible = true;
+        },
+        formChange({ value, item, key }) {
+            if (key === 'buy') {
+                let { buy, model } = this.forms.model;
+                let find = this.modelOpts.find(level1 => level1.value === model);
+                this.forms.model.stop_buy = buy * (find.profit / 100 + 1);
+            }
         }
     }
 };

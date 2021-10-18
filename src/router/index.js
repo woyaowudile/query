@@ -2,13 +2,11 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
-import views from '../views';
+import routes from '../views';
 
-console.log(views);
+console.log(routes);
 let router = new VueRouter({
-    views
+    routes
 });
 
-export function createRouter() {
-    return router;
-}
+export default router;

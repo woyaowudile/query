@@ -9,6 +9,7 @@
                     :rows="2"
                     placeholder="请输入内容"
                     v-model="forms.model[item.key]"
+                    @change="change($event, item, item.key)"
                 >
                 </el-input>
                 <el-input-number
@@ -16,6 +17,7 @@
                     v-model="forms.model[item.key]"
                     :precision="2"
                     :step="0.1"
+                    @change="change($event, item, item.key)"
                 ></el-input-number>
                 <el-date-picker
                     v-else-if="item.type === 'date'"
@@ -23,9 +25,15 @@
                     value-format="yyyy-MM-dd"
                     type="date"
                     placeholder="选择日期"
+                    @change="change($event, item, item.key)"
                 >
                 </el-date-picker>
-                <el-select v-else-if="item.type === 'select'" v-model="forms.model[item.key]" placeholder="请选择">
+                <el-select
+                    v-else-if="item.type === 'select'"
+                    v-model="forms.model[item.key]"
+                    placeholder="请选择"
+                    @change="change($event, item, item.key)"
+                >
                     <el-option
                         v-for="level2 in item.options"
                         :key="level2.value"
@@ -56,6 +64,9 @@ export default {
     methods: {
         getModel() {
             return this.forms?.model;
+        },
+        change(value, item, key) {
+            this.$emit('on-change', { value, item, key });
         }
     }
 };

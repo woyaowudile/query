@@ -1,16 +1,4 @@
 import trade from './trade';
+import query from './query';
 
-export default {
-    // index: {
-    //     path: '/',
-    //     name: 'index',
-    //     component: tableSection
-    //     // redirect() {
-    //     //   return { name: "index.table" };
-    //     // },
-    //     // children: [tableSection]
-    // }
-    path: '/trade',
-    name: 'trade',
-    component: trade
-};
+export default [query, trade];

@@ -1,4 +1,5 @@
 let node3333 = `/node3333`;
+let node3334 = `/node3334`;
 
 function add(params) {
     return fetch(`/api/trade/add`, {
@@ -43,6 +44,15 @@ function download({ d }) {
     return fetch(url).then(res => res.json());
 }
 
+//
+function getquery(params) {
+    let str = '';
+    Object.keys(params).forEach(v => {
+        str += `${v}=${params[v]}&`;
+    });
+    return fetch(`${node3334}/api/query?${str.slice(0, -1)}`).then(res => res.json());
+}
+
 export default {
     add,
     del,
@@ -50,5 +60,6 @@ export default {
     echartQuery,
     query,
     beforeDownload,
+    getquery,
     download
 };
